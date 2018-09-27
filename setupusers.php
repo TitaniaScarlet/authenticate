@@ -4,10 +4,10 @@ $conn = new mysqli($hn, $ur, $pw, $db);
 if($conn->connect_error) die($conn->connect_error);
 ?>
 <pre><form action="setupusers.php" method = "post">
-    Имя     <input type = "text" name = "forename">
-    Фамилия <input type = "text" name = "surname">
-    Логин   <input type = "text" name="username" >
-    Пароль  <input type="password" name="password">
+    Имя                <input type = "text" name = "forename">
+    Фамилия            <input type = "text" name = "surname">
+    Имя пользователя   <input type = "text" name="username" > Разрешено от 3 до 20 символов: a-z, A-Z, 0-9, -, _
+    Пароль             <input type="password" name="password"> Разрешено от 8 до 20 символов: a-z, A-Z, 0-9
 <input type="submit" value="Зарегистрироваться">
 </form> </pre>
 <?php
