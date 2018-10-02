@@ -1,5 +1,4 @@
 <?php
-
 require_once "login.php";
 $conn = new mysqli($hn, $ur, $pw, $db);
 if($conn->connect_error) die($conn->connect_error);
@@ -17,23 +16,17 @@ if($conn->connect_error) die($conn->connect_error);
 <?php
 if(isset($_POST['username']) && isset($_POST['password']))
     {
-        $username = mysql_entities_fix_string($conn, $_POST['username']);
-        $password = mysql_entities_fix_string($conn, $_POST['password']);
-        $query = "SELECT *FROM users WHERE username='$username'";
-        $result = $conn->query($query);
+        $stmt = $conn->prepare('SELECT username, password FROM users WHERE username = ? AND password = ?');
+        $stmt->bind_param('ss', $username,$token);
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $token = password_verify($password, $hash);
+        $stmt->execute();
+        $result = $stmt->affected_rows;
         if (!$result) die($conn->error);
-        elseif ($result->num_rows)
+        elseif ($result)
         {
-            $row = $result->fetch_array(MYSQLI_NUM);
-            $result->close();
-            $salt1 = "gm&h*";
-            $salt2 = "pg!@";
-            $token = hash('ripemd128', "$salt1$password$salt2");
-            if($token == $row[3])
-            {
-
-
-                              if (isset($_POST['remember']))
+            if (isset($_POST['remember']))
                 {
                     session_start();
                     $_SESSION['username'] = $username;
@@ -50,23 +43,9 @@ if(isset($_POST['username']) && isset($_POST['password']))
             }
             else die("Неверная комбинация имя пользователя - пароль");
         }
-        else die("Неверная комбинация имя пользователя - пароль");
-    }
 else {
     die("Пожалуйста, введите имя пользователя и пароль или зарегистрируйтесь");
 }
+$result->close();
 $conn->close();
-function mysql_entities_fix_string($conn, $string)
-{
-    return htmlentities(mysql_fix_string($conn, $string));
-}
-function mysql_fix_string($conn, $string)
-{
-    if(get_magic_quotes_gpc())
-        $string = stripslashes($string);
-    $string = $conn->real_escape_string($string);
-    return $string;
-}
-
-
 ?>
